@@ -1,37 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="184.0" prefWidth="295.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haynes.pomodoro.PomodoroController">
+<BorderPane prefHeight="237.0" prefWidth="217.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haynes.pomodoro.PomodoroController">
    <center>
-      <VBox alignment="CENTER" spacing="20.0">
+      <GridPane maxHeight="140.0" prefHeight="140.0" prefWidth="197.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="128.0" minWidth="10.0" prefWidth="74.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="151.0" minWidth="10.0" prefWidth="72.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="151.0" minWidth="10.0" prefWidth="61.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="43.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="48.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
+         </rowConstraints>
          <children>
-            <TextField fx:id="tfTask" promptText="Enter a task" />
-            <Label fx:id="lbTimer" text="25:00" />
-            <Button fx:id="btStart" onAction="#startAction" text="Start" />
+            <Label fx:id="lbTimer" text="25:00" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <ToggleButton fx:id="btLongBreak" mnemonicParsing="false" onAction="#longBreakAction" text="LB" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+            <ToggleButton fx:id="btStart" mnemonicParsing="false" onAction="#startAction" text="P" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <ToggleButton fx:id="btShortBreak" mnemonicParsing="false" onAction="#shortBreakAction" text="SB" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
          </children>
-         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </padding>
-      </VBox>
+      </GridPane>
    </center>
-   <top>
-      <HBox prefHeight="12.0" prefWidth="200.0" spacing="15.0" BorderPane.alignment="CENTER">
-         <children>
-            <RadioButton fx:id="rbPomodoro" mnemonicParsing="false" text="Pomodoro" />
-            <RadioButton fx:id="rbShortBreak" mnemonicParsing="false" text="Short Break" />
-            <RadioButton fx:id="rbLongBreak" mnemonicParsing="false" text="Long Break" />
-         </children>
-      </HBox>
-   </top>
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
+   <bottom>
+      <VBox fx:id="pnHistory" prefWidth="100.0" BorderPane.alignment="CENTER" />
+   </bottom>
+   <top>
+      <BorderPane BorderPane.alignment="CENTER">
+         <center>
+            <TextField fx:id="tfTask" prefHeight="29.0" prefWidth="197.0" promptText="Enter a task" />
+         </center>
+         <left>
+            <Label text="Task:" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </BorderPane.margin>
+            </Label>
+         </left>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </BorderPane>
+   </top>
 </BorderPane>

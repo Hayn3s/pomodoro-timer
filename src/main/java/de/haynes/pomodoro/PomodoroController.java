@@ -2,6 +2,7 @@ package de.haynes.pomodoro;
 
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -13,13 +14,15 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.VBox;
 
 public class PomodoroController implements Initializable {
 
@@ -29,16 +32,13 @@ public class PomodoroController implements Initializable {
 	private static final long TIMER_INTERVAL = 100L;
 
 	@FXML
-	private Button btStart;
+	private ToggleButton btStart;
 
 	@FXML
-	private RadioButton rbPomodoro;
+	private ToggleButton btShortBreak;
 
 	@FXML
-	private RadioButton rbShortBreak;
-
-	@FXML
-	private RadioButton rbLongBreak;
+	private ToggleButton btLongBreak;
 
 	@FXML
 	private Label lbTimer;
@@ -46,48 +46,47 @@ public class PomodoroController implements Initializable {
 	@FXML
 	private TextField tfTask;
 
-	private ToggleGroup toggleGroup = new ToggleGroup();
+	@FXML
+	private VBox pnHistory;
 
 	private LongProperty timerProperty = new SimpleLongProperty(POMODORO_UNIT_MILLIS);
 	private BooleanProperty isRunningProperty = new SimpleBooleanProperty(false);
+	private StringProperty taskPropery = new SimpleStringProperty();
 
-	private DateFormat df = new SimpleDateFormat("mm:ss");
+	private DateFormat dfCountDown = new SimpleDateFormat("mm:ss");
+	private DateFormat dfHistory = new SimpleDateFormat("HH:mm");
 	private long timerTarget;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		timerProperty.addListener(o -> lbTimer.setText(df.format(new Date(timerProperty.get()))));
+		timerProperty.addListener(o -> lbTimer.setText(dfCountDown.format(new Date(timerProperty.get()))));
+		tfTask.textProperty().bindBidirectional(taskPropery);
 
-		btStart.disableProperty().bind(isRunningProperty);
+		btStart.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
+		btShortBreak.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
+		btLongBreak.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
 		
-		rbPomodoro.setToggleGroup(toggleGroup);
-		rbShortBreak.setToggleGroup(toggleGroup);
-		rbLongBreak.setToggleGroup(toggleGroup);
-
-		toggleGroup.selectedToggleProperty().addListener(o -> toggleMode());
-
-		rbPomodoro.setSelected(true);
-
-		rbPomodoro.disableProperty().bind(isRunningProperty);
-		rbShortBreak.disableProperty().bind(isRunningProperty);
-		rbLongBreak.disableProperty().bind(isRunningProperty);
-		tfTask.disableProperty().bind(timerProperty.isEqualTo(POMODORO_UNIT_MILLIS).not());
-
-	}
-
-	private void toggleMode() {
-		if (rbPomodoro.isSelected()) {
-			timerProperty.set(POMODORO_UNIT_MILLIS);
-		} else if (rbShortBreak.isSelected()) {
-			timerProperty.set(SHORT_BREAK_MILLIS);
-		} else if (rbLongBreak.isSelected()) {
-			timerProperty.set(LONG_BREAK_MILLIS);
-		}
 	}
 
 	@FXML
 	private void startAction() {
+		startCountdown(POMODORO_UNIT_MILLIS);
+
+	}
+
+	@FXML
+	private void shortBreakAction() {
+		startCountdown(SHORT_BREAK_MILLIS);
+	}
+
+	@FXML
+	private void longBreakAction() {
+		startCountdown(LONG_BREAK_MILLIS);
+	}
+
+	private void startCountdown(long timeInMillis) {
 		isRunningProperty.set(true);
+		timerProperty.set(timeInMillis);
 		timerTarget = System.currentTimeMillis() + timerProperty.get();
 		final Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
@@ -96,12 +95,28 @@ public class PomodoroController implements Initializable {
 			public void run() {
 				long millisLeft = timerTarget - System.currentTimeMillis();
 				if (millisLeft < 0L) {
-					Platform.runLater(() -> isRunningProperty.set(false));
+					Platform.runLater(() -> {
+						isRunningProperty.set(false);
+						if (btStart.isSelected()) {
+							addHistoryEntry();
+						}
+						btStart.setSelected(false);
+						btShortBreak.setSelected(false);
+						btLongBreak.setSelected(false);
+					});
+
 					timer.cancel();
 				} else {
 					Platform.runLater(() -> timerProperty.set(millisLeft));
 				}
 			}
 		}, TIMER_INTERVAL, TIMER_INTERVAL);
-    }
+	}
+
+	private void addHistoryEntry() {
+		Hyperlink hyperlink = new Hyperlink(
+				MessageFormat.format("{0}h - {1}", dfHistory.format(new Date(timerTarget)), tfTask.getText()));
+		hyperlink.setOnAction(e -> taskPropery.set(hyperlink.getText().substring("00:00h - ".length())));
+		pnHistory.getChildren().add(hyperlink);
+	}
 }
