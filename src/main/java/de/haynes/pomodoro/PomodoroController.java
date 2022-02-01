@@ -17,17 +17,21 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 
 public class PomodoroController implements Initializable {
 
     private static final long POMODORO_UNIT_MILLIS = 1000L * 60L * 25L;
-	private static final long SHORT_BREAK_MILLIS = 1000L * 60L * 5L;
+    private static final long SHORT_BREAK_MILLIS = 1000L * 60L * 5L;
 	private static final long LONG_BREAK_MILLIS = 1000L * 60L * 15L;
 	private static final long TIMER_INTERVAL = 100L;
 
@@ -49,6 +53,9 @@ public class PomodoroController implements Initializable {
 	@FXML
 	private VBox pnHistory;
 
+    @FXML
+    private Canvas canvas;
+
 	private final LongProperty timerProperty = new SimpleLongProperty(POMODORO_UNIT_MILLIS);
 	private final BooleanProperty isRunningProperty = new SimpleBooleanProperty(false);
 	private final StringProperty taskPropery = new SimpleStringProperty();
@@ -56,6 +63,7 @@ public class PomodoroController implements Initializable {
 	private final DateFormat dfCountDown = new SimpleDateFormat("mm:ss");
 	private final DateFormat dfHistory = new SimpleDateFormat("HH:mm");
 	private long timerTarget;
+    private long currentTimerUnit;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -88,6 +96,7 @@ public class PomodoroController implements Initializable {
 		isRunningProperty.set(true);
 		timerProperty.set(timeInMillis);
 		timerTarget = System.currentTimeMillis() + timerProperty.get();
+        currentTimerUnit = timerProperty.get();
 		final Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 
@@ -99,13 +108,29 @@ public class PomodoroController implements Initializable {
 
 					timer.cancel();
 				} else {
-					Platform.runLater(() -> timerProperty.set(millisLeft));
+					Platform.runLater(() -> tick(millisLeft));
 				}
 			}
 
 
+
+
 		}, TIMER_INTERVAL, TIMER_INTERVAL);
 	}
+
+    private void tick(long millisLeft) {
+        timerProperty.set(millisLeft);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setFill(Color.LIGHTGREEN);
+        double progress = ((double) millisLeft) / currentTimerUnit;
+        double diameter = progress * canvas.getWidth() * .75d;
+        double radius = diameter / 2;
+
+        gc.fillArc(canvas.getWidth() / 2 - radius, canvas.getHeight() / 2 - radius, diameter, diameter,
+            btStart.isSelected() ? 0d : 180d, 180d,
+            ArcType.OPEN);
+    }
 
     private void endCountdown() {
         isRunningProperty.set(false);
