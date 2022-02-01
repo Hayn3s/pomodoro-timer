@@ -1,0 +1,6 @@
+.cycle-background {
+-fx-background-image: url('cycle.png');
+-fx-background-repeat: no-repeat; 
+-fx-background-size: 90% 100%;
+-fx-background-position: center center;
+}

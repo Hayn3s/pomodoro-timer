@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
@@ -23,10 +22,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class PomodoroController implements Initializable {
 
-	private static final long POMODORO_UNIT_MILLIS = 1000L * 60L * 25L;
+    private static final long POMODORO_UNIT_MILLIS = 1000L * 60L * 25L;
 	private static final long SHORT_BREAK_MILLIS = 1000L * 60L * 5L;
 	private static final long LONG_BREAK_MILLIS = 1000L * 60L * 15L;
 	private static final long TIMER_INTERVAL = 100L;
@@ -49,12 +49,12 @@ public class PomodoroController implements Initializable {
 	@FXML
 	private VBox pnHistory;
 
-	private LongProperty timerProperty = new SimpleLongProperty(POMODORO_UNIT_MILLIS);
-	private BooleanProperty isRunningProperty = new SimpleBooleanProperty(false);
-	private StringProperty taskPropery = new SimpleStringProperty();
+	private final LongProperty timerProperty = new SimpleLongProperty(POMODORO_UNIT_MILLIS);
+	private final BooleanProperty isRunningProperty = new SimpleBooleanProperty(false);
+	private final StringProperty taskPropery = new SimpleStringProperty();
 
-	private DateFormat dfCountDown = new SimpleDateFormat("mm:ss");
-	private DateFormat dfHistory = new SimpleDateFormat("HH:mm");
+	private final DateFormat dfCountDown = new SimpleDateFormat("mm:ss");
+	private final DateFormat dfHistory = new SimpleDateFormat("HH:mm");
 	private long timerTarget;
 
 	@Override
@@ -95,28 +95,39 @@ public class PomodoroController implements Initializable {
 			public void run() {
 				long millisLeft = timerTarget - System.currentTimeMillis();
 				if (millisLeft < 0L) {
-					Platform.runLater(() -> {
-						isRunningProperty.set(false);
-						if (btStart.isSelected()) {
-							addHistoryEntry();
-						}
-						btStart.setSelected(false);
-						btShortBreak.setSelected(false);
-						btLongBreak.setSelected(false);
-					});
+                    Platform.runLater(() -> endCountdown());
 
 					timer.cancel();
 				} else {
 					Platform.runLater(() -> timerProperty.set(millisLeft));
 				}
 			}
+
+
 		}, TIMER_INTERVAL, TIMER_INTERVAL);
 	}
+
+    private void endCountdown() {
+        isRunningProperty.set(false);
+        if (btStart.isSelected()) {
+            addHistoryEntry();
+        }
+        btStart.setSelected(false);
+        btShortBreak.setSelected(false);
+        btLongBreak.setSelected(false);
+
+        Stage stage = (Stage) btStart.getScene().getWindow();
+        if (!stage.isFocused()) {
+            stage.hide();
+        }
+        stage.show();
+    }
 
 	private void addHistoryEntry() {
 		Hyperlink hyperlink = new Hyperlink(
 				MessageFormat.format("{0}h - {1}", dfHistory.format(new Date(timerTarget)), tfTask.getText()));
 		hyperlink.setOnAction(e -> taskPropery.set(hyperlink.getText().substring("00:00h - ".length())));
 		pnHistory.getChildren().add(hyperlink);
+        pnHistory.requestLayout();
 	}
 }
