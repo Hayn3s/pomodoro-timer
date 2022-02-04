@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Hyperlink;
@@ -28,10 +29,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 
-public class PomodoroController implements Initializable {
+public class PomodoroPresenter implements Initializable {
 
-    private static final long POMODORO_UNIT_MILLIS = 1000L * 60L * 25L;
-    private static final long SHORT_BREAK_MILLIS = 1000L * 60L * 5L;
+    private static final long POMODORO_UNIT_MILLIS = 10L * 60L * 25L;
+    private static final long SHORT_BREAK_MILLIS = 10L * 60L * 5L;
 	private static final long LONG_BREAK_MILLIS = 1000L * 60L * 15L;
 	private static final long TIMER_INTERVAL = 100L;
 
@@ -73,10 +74,62 @@ public class PomodoroController implements Initializable {
 		btStart.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
 		btShortBreak.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
 		btLongBreak.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
-		
 	}
 
-	@FXML
+    public void drawArrowsWithProgressIndication(double progress) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        gc.setLineWidth(3.0);
+
+        Bounds btStartBounds = canvas.sceneToLocal(btStart.localToScene(btShortBreak.getBoundsInLocal()));
+        Bounds btShortBreakBounds = canvas.sceneToLocal(btShortBreak.localToScene(btShortBreak.getBoundsInLocal()));
+
+        double arcHeight = 120d;
+        double arcOffsetY = 3d;
+        double arrowOffsetY = 1d;
+
+        gc.setStroke(progress >= 1 && btStart.isSelected() ? Color.GREEN : Color.BLACK);
+        
+        gc.strokeArc(btStartBounds.getCenterX(), btStartBounds.getMinY() - (arcHeight / 2.0) - arcOffsetY,
+            btShortBreakBounds.getMaxX() - btStartBounds.getCenterX(), arcHeight, 0.0, 180.0,
+            ArcType.OPEN);
+
+        gc.strokeLine(btShortBreakBounds.getMaxX(), btStartBounds.getMinY() - arrowOffsetY,
+            btShortBreakBounds.getMaxX() + 10d, btStartBounds.getMinY() - arrowOffsetY - 10d);
+
+        gc.strokeLine(btShortBreakBounds.getMaxX(), btStartBounds.getMinY() - arrowOffsetY,
+            btShortBreakBounds.getMaxX() - 10d, btStartBounds.getMinY() - arrowOffsetY - 10d);
+
+        gc.setStroke(progress >= 1 && !btStart.isSelected() ? Color.GREEN : Color.BLACK);
+
+        gc.strokeArc(btStartBounds.getCenterX(), btStartBounds.getMaxY() - (arcHeight / 2.0) + arcOffsetY,
+            btShortBreakBounds.getMaxX() - btStartBounds.getCenterX(), arcHeight, 180.0, 180.0,
+            ArcType.OPEN);
+
+        gc.strokeLine(btStartBounds.getCenterX(), btStartBounds.getMaxY() + arrowOffsetY,
+            btStartBounds.getCenterX() - 10d, btStartBounds.getMaxY() + arrowOffsetY + 10d);
+
+        gc.strokeLine(btStartBounds.getCenterX(), btStartBounds.getMaxY() + arrowOffsetY,
+            btStartBounds.getCenterX() + 10d, btStartBounds.getMaxY() + arrowOffsetY + 10d);
+
+        gc.setStroke(Color.GREEN);
+        if (progress > 0.0)
+         {
+             if (btStart.isSelected())
+             {
+                gc.strokeArc(btStartBounds.getCenterX(), btStartBounds.getMinY() - (arcHeight / 2.0) - arcOffsetY,
+                     btShortBreakBounds.getMaxX() - btStartBounds.getCenterX(), arcHeight, 180.0, -180.0 * progress,
+                     ArcType.OPEN);
+             } else {
+                 gc.strokeArc(btStartBounds.getCenterX(), btStartBounds.getMaxY() - (arcHeight / 2.0) + arcOffsetY,
+                     btShortBreakBounds.getMaxX() - btStartBounds.getCenterX(), arcHeight, 0, -180.0 * progress,
+                     ArcType.OPEN);
+            }
+        }
+    }
+
+    @FXML
 	private void startAction() {
 		startCountdown(POMODORO_UNIT_MILLIS);
 
@@ -111,28 +164,19 @@ public class PomodoroController implements Initializable {
 					Platform.runLater(() -> tick(millisLeft));
 				}
 			}
-
-
-
-
 		}, TIMER_INTERVAL, TIMER_INTERVAL);
 	}
 
     private void tick(long millisLeft) {
         timerProperty.set(millisLeft);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gc.setFill(Color.LIGHTGREEN);
-        double progress = ((double) millisLeft) / currentTimerUnit;
-        double diameter = progress * canvas.getWidth() * .75d;
-        double radius = diameter / 2;
 
-        gc.fillArc(canvas.getWidth() / 2 - radius, canvas.getHeight() / 2 - radius, diameter, diameter,
-            btStart.isSelected() ? 0d : 180d, 180d,
-            ArcType.OPEN);
+        double progress = ((double) currentTimerUnit - millisLeft) / currentTimerUnit;
+
+        drawArrowsWithProgressIndication(progress);
     }
 
     private void endCountdown() {
+        tick(0L);
         isRunningProperty.set(false);
         if (btStart.isSelected()) {
             addHistoryEntry();
