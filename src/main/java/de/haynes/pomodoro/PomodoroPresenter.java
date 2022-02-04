@@ -31,8 +31,8 @@ import javafx.stage.Stage;
 
 public class PomodoroPresenter implements Initializable {
 
-    private static final long POMODORO_UNIT_MILLIS = 10L * 60L * 25L;
-    private static final long SHORT_BREAK_MILLIS = 10L * 60L * 5L;
+    private static final long POMODORO_UNIT_MILLIS = 1000L * 60L * 25L;
+    private static final long SHORT_BREAK_MILLIS = 1000L * 60L * 5L;
 	private static final long LONG_BREAK_MILLIS = 1000L * 60L * 15L;
 	private static final long TIMER_INTERVAL = 100L;
 
