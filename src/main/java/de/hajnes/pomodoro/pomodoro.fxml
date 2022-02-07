@@ -8,68 +8,55 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="406.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.hajnes.pomodoro.PomodoroPresenter">
    <center>
-      <StackPane>
+      <VBox>
          <children>
-            <Canvas fx:id="canvas" height="200.0" width="250.0" />
-            <GridPane maxHeight="160.0" maxWidth="250.0" prefHeight="160.0" prefWidth="250.0">
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="128.0" minWidth="10.0" prefWidth="60.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="159.0" minWidth="10.0" prefWidth="130.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="151.0" minWidth="10.0" prefWidth="60.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="43.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="48.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
-               </rowConstraints>
+            <StackPane>
                <children>
-                  <Label fx:id="lbTimer" text="25:00" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
-                     <font>
-                        <Font size="40.0" />
-                     </font>
-                  </Label>
-                  <ToggleButton fx:id="btStart" mnemonicParsing="false" onAction="#startAction" text="P" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                  <GridPane GridPane.columnIndex="2" GridPane.rowIndex="1">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <ToggleButton fx:id="btShortBreak" mnemonicParsing="false" onAction="#shortBreakAction" text="SB" />
-                        <ToggleButton fx:id="btLongBreak" mnemonicParsing="false" onAction="#longBreakAction" text="LB" GridPane.columnIndex="1" />
-                     </children>
-                  </GridPane>
+                  <Canvas fx:id="canvas" height="200.0" width="200.0" />
+                  <BorderPane maxHeight="200.0" maxWidth="200.0" prefHeight="200.0" prefWidth="200.0">
+                     <center>
+                        <Label fx:id="lbTimer" text="25:00">
+                           <font>
+                              <Font size="40.0" />
+                           </font>
+                        </Label>
+                     </center>
+                     <left>
+                        <ToggleButton fx:id="btStart" mnemonicParsing="false" onAction="#startAction" text="P" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+                           <children>
+                              <ToggleButton fx:id="btShortBreak" mnemonicParsing="false" onAction="#shortBreakAction" text="SB" />
+                              <ToggleButton fx:id="btLongBreak" mnemonicParsing="false" onAction="#longBreakAction" text="LB" />
+                           </children>
+                        </HBox>
+                     </right>
+                  </BorderPane>
                </children>
-            </GridPane>
+            </StackPane>
+            <TitledPane collapsible="false" maxHeight="1.7976931348623157E308" prefHeight="150.0" text="History" VBox.vgrow="ALWAYS">
+               <content>
+                  <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308">
+                     <content>
+                        <VBox fx:id="pnHistory" />
+                     </content>
+                  </ScrollPane>
+               </content>
+            </TitledPane>
          </children>
-      </StackPane>
+      </VBox>
    </center>
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
-   <bottom>
-      <TitledPane collapsible="false" maxHeight="1.7976931348623157E308" prefHeight="150.0" text="History">
-         <content>
-            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308">
-               <content>
-                  <VBox fx:id="pnHistory" />
-               </content>
-            </ScrollPane>
-         </content>
-      </TitledPane>
-   </bottom>
    <top>
       <BorderPane BorderPane.alignment="CENTER">
          <center>

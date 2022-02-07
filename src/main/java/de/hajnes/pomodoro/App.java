@@ -5,6 +5,7 @@ import com.airhacks.afterburner.injection.Injector;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -15,6 +16,7 @@ public class App extends Application {
         Scene scene = new Scene(pomodoroView.getView());
         stage.setScene(scene);
         stage.setTitle("Pomodoro-Timer");
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("icon.png")));
 		stage.setOnCloseRequest(e -> {
 			Platform.exit();
 			System.exit(0);
