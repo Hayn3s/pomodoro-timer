@@ -5,5 +5,5 @@ module de.haynes.pomodoro {
     requires afterburner.fx;
     requires java.annotation;
 
-    opens de.haynes.pomodoro to javafx.fxml;
+    opens de.hajnes.pomodoro to javafx.fxml;
 }

@@ -1,4 +1,4 @@
-package de.haynes.pomodoro;
+package de.hajnes.pomodoro;
 
 import java.net.URL;
 import java.text.DateFormat;

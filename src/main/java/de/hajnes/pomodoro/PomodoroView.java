@@ -1,7 +1,7 @@
 /**
  * Copyright (c) Robotron Datenbank-Software GmbH and/or its affiliates. All rights reserved.
  */
-package de.haynes.pomodoro;
+package de.hajnes.pomodoro;
 
 import com.airhacks.afterburner.views.FXMLView;
 

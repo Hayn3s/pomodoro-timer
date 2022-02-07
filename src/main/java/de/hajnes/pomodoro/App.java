@@ -1,4 +1,4 @@
-package de.haynes.pomodoro;
+package de.hajnes.pomodoro;
 
 import java.io.IOException;
 import com.airhacks.afterburner.injection.Injector;

@@ -1,4 +1,4 @@
-package de.haynes.pomodoro;
+package de.hajnes.pomodoro;
 
 public class PomodoroTimer {
 
