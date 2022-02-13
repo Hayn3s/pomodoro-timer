@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
@@ -34,7 +35,13 @@ public class PomodoroPresenter implements Initializable {
     private static final long POMODORO_UNIT_MILLIS = 1000L * 60L * 25L;
     private static final long SHORT_BREAK_MILLIS = 1000L * 60L * 5L;
 	private static final long LONG_BREAK_MILLIS = 1000L * 60L * 15L;
+
 	private static final long TIMER_INTERVAL = 100L;
+
+	private static final double ARC_HEIGHT = 120d;
+	private static final double HALF_ARC_HEIGHT = 120d / 2d;
+	private static final double ARC_OFFSET_Y = 3d;
+	private static final double ARROWHEAD_OFFSET_Y = 1d;
 
 	@FXML
 	private ToggleButton btStart;
@@ -85,51 +92,50 @@ public class PomodoroPresenter implements Initializable {
         Bounds btStartBounds = canvas.sceneToLocal(btStart.localToScene(btShortBreak.getBoundsInLocal()));
         Bounds btShortBreakBounds = canvas.sceneToLocal(btShortBreak.localToScene(btShortBreak.getBoundsInLocal()));
 
-        double arcHeight = 120d;
-        double arcOffsetY = 3d;
-        double arrowOffsetY = 1d;
+		double arcWidth = btShortBreakBounds.getMaxX() - btStartBounds.getCenterX();
 
         gc.setStroke(progress >= 1 && btStart.isSelected() ? Color.GREEN : Color.BLACK);
-        
-        gc.strokeArc(btStartBounds.getCenterX(), btStartBounds.getMinY() - (arcHeight / 2.0) - arcOffsetY,
-            btShortBreakBounds.getMaxX() - btStartBounds.getCenterX(), arcHeight, 0.0, 180.0,
-            ArcType.OPEN);
 
-        gc.strokeLine(btShortBreakBounds.getMaxX(), btStartBounds.getMinY() - arrowOffsetY,
-            btShortBreakBounds.getMaxX() + 10d, btStartBounds.getMinY() - arrowOffsetY - 10d);
-
-        gc.strokeLine(btShortBreakBounds.getMaxX(), btStartBounds.getMinY() - arrowOffsetY,
-            btShortBreakBounds.getMaxX() - 10d, btStartBounds.getMinY() - arrowOffsetY - 10d);
+		drawHalfCircle(gc, btStartBounds.getCenterX(), btStartBounds.getMinY() - ARC_OFFSET_Y, arcWidth, 0d);
+		drawArrowHead(gc, btShortBreakBounds.getMaxX(), btStartBounds.getMinY() - ARROWHEAD_OFFSET_Y, -10d);
 
         gc.setStroke(progress >= 1 && !btStart.isSelected() ? Color.GREEN : Color.BLACK);
 
-        gc.strokeArc(btStartBounds.getCenterX(), btStartBounds.getMaxY() - (arcHeight / 2.0) + arcOffsetY,
-            btShortBreakBounds.getMaxX() - btStartBounds.getCenterX(), arcHeight, 180.0, 180.0,
-            ArcType.OPEN);
-
-        gc.strokeLine(btStartBounds.getCenterX(), btStartBounds.getMaxY() + arrowOffsetY,
-            btStartBounds.getCenterX() - 10d, btStartBounds.getMaxY() + arrowOffsetY + 10d);
-
-        gc.strokeLine(btStartBounds.getCenterX(), btStartBounds.getMaxY() + arrowOffsetY,
-            btStartBounds.getCenterX() + 10d, btStartBounds.getMaxY() + arrowOffsetY + 10d);
+		drawHalfCircle(gc, btStartBounds.getCenterX(), btStartBounds.getMaxY() + ARC_OFFSET_Y, arcWidth, 180d);
+		drawArrowHead(gc, btStartBounds.getCenterX(), btStartBounds.getMaxY() + ARROWHEAD_OFFSET_Y, 10d);
 
         gc.setStroke(Color.GREEN);
-        if (progress > 0.0)
-         {
-             if (btStart.isSelected())
-             {
-                gc.strokeArc(btStartBounds.getCenterX(), btStartBounds.getMinY() - (arcHeight / 2.0) - arcOffsetY,
-                     btShortBreakBounds.getMaxX() - btStartBounds.getCenterX(), arcHeight, 180.0, -180.0 * progress,
-                     ArcType.OPEN);
-             } else {
-                 gc.strokeArc(btStartBounds.getCenterX(), btStartBounds.getMaxY() - (arcHeight / 2.0) + arcOffsetY,
-                     btShortBreakBounds.getMaxX() - btStartBounds.getCenterX(), arcHeight, 0, -180.0 * progress,
-                     ArcType.OPEN);
-            }
-        }
+		if (progress > 0.0 && progress < 1.0) {
+			double arcExtendProgress = -180.0 * progress;
+			if (btStart.isSelected()) {
+				drawProgressCircle(gc, btStartBounds.getCenterX(), btStartBounds.getMinY() - ARC_OFFSET_Y, arcWidth,
+						180d,
+						arcExtendProgress);
+			} else {
+				drawProgressCircle(gc, btStartBounds.getCenterX(), btStartBounds.getMaxY() + ARC_OFFSET_Y, arcWidth,
+						0d,
+						arcExtendProgress);
+			}
+		}
     }
 
-    @FXML
+	private static void drawProgressCircle(GraphicsContext gc, double x, double y, double w,
+			double startAngle,
+			double extend) {
+		gc.strokeArc(x, y - HALF_ARC_HEIGHT, w, ARC_HEIGHT, startAngle, extend,
+            ArcType.OPEN);
+	}
+
+	private static void drawHalfCircle(GraphicsContext gc, double x, double y, double w, double startAngle) {
+		drawProgressCircle(gc, x, y, w, startAngle, 180d);
+	}
+
+	private static void drawArrowHead(GraphicsContext gc, double x, double y, double yDirection) {
+		gc.strokeLine(x, y, x + 10d, y + yDirection);
+		gc.strokeLine(x, y, x - 10d, y + yDirection);
+	}
+
+	@FXML
 	private void startAction() {
 		startCountdown(POMODORO_UNIT_MILLIS);
 

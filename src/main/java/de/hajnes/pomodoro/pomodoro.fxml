@@ -29,13 +29,13 @@
                         </Label>
                      </center>
                      <left>
-                        <ToggleButton fx:id="btStart" mnemonicParsing="false" onAction="#startAction" text="P" BorderPane.alignment="CENTER" />
+                        <ToggleButton fx:id="btStart" mnemonicParsing="false" onAction="#startAction" styleClass="tomato-button" text="P" BorderPane.alignment="CENTER" />
                      </left>
                      <right>
                         <HBox alignment="CENTER" BorderPane.alignment="CENTER">
                            <children>
-                              <ToggleButton fx:id="btShortBreak" mnemonicParsing="false" onAction="#shortBreakAction" text="SB" />
-                              <ToggleButton fx:id="btLongBreak" mnemonicParsing="false" onAction="#longBreakAction" text="LB" />
+                              <ToggleButton fx:id="btShortBreak" mnemonicParsing="false" onAction="#shortBreakAction" styleClass="tomato-button" text="SB" />
+                              <ToggleButton fx:id="btLongBreak" mnemonicParsing="false" onAction="#longBreakAction" styleClass="tomato-button" text="LB" />
                            </children>
                         </HBox>
                      </right>
