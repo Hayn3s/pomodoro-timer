@@ -75,6 +75,17 @@
          <BorderPane.margin>
             <Insets />
          </BorderPane.margin>
+         <top>
+            <HBox alignment="TOP_RIGHT" spacing="5.0">
+               <children>
+                  <ToggleButton fx:id="btSound" mnemonicParsing="false" selected="true" text="S" />
+                  <ToggleButton fx:id="btRemind" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" selected="true" text="R" />
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </BorderPane.margin>
+            </HBox>
+         </top>
       </BorderPane>
    </top>
 </BorderPane>

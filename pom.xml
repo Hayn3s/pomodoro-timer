@@ -22,6 +22,11 @@
             <version>16</version>
         </dependency>
         <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>16</version>
+        </dependency>
+        <dependency>
             <groupId>com.airhacks</groupId>
             <artifactId>afterburner.fx</artifactId>
             <version>1.7.0</version>
@@ -49,6 +54,7 @@
                     <include>**/*.css</include>
                     <include>**/*.properties</include>
                     <include>**/*.png</include>
+                    <include>**/*.m4a</include>
                 </includes>
             </resource>
         </resources>

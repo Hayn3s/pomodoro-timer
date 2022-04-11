@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
@@ -26,6 +25,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
@@ -33,10 +34,11 @@ import javafx.stage.Stage;
 public class PomodoroPresenter implements Initializable {
 
     private static final long POMODORO_UNIT_MILLIS = 1000L * 60L * 25L;
-    private static final long SHORT_BREAK_MILLIS = 1000L * 60L * 5L;
+    private static final long SHORT_BREAK_MILLIS = 1000L * 5L;
 	private static final long LONG_BREAK_MILLIS = 1000L * 60L * 15L;
 
 	private static final long TIMER_INTERVAL = 100L;
+    private static final long REMINDER_TIMER_INTERVAL = 1000L * 60L * 3L;
 
 	private static final double ARC_HEIGHT = 120d;
 	private static final double HALF_ARC_HEIGHT = 120d / 2d;
@@ -52,6 +54,12 @@ public class PomodoroPresenter implements Initializable {
 	@FXML
 	private ToggleButton btLongBreak;
 
+    @FXML
+    private ToggleButton btRemind;
+
+    @FXML
+    private ToggleButton btSound;
+
 	@FXML
 	private Label lbTimer;
 
@@ -64,9 +72,13 @@ public class PomodoroPresenter implements Initializable {
     @FXML
     private Canvas canvas;
 
+    private MediaPlayer player;
+
 	private final LongProperty timerProperty = new SimpleLongProperty(POMODORO_UNIT_MILLIS);
 	private final BooleanProperty isRunningProperty = new SimpleBooleanProperty(false);
 	private final StringProperty taskPropery = new SimpleStringProperty();
+    private final BooleanProperty isRemindProperty = new SimpleBooleanProperty();
+    private final BooleanProperty isSoundEnabledProperty = new SimpleBooleanProperty();
 
 	private final DateFormat dfCountDown = new SimpleDateFormat("mm:ss");
 	private final DateFormat dfHistory = new SimpleDateFormat("HH:mm");
@@ -81,7 +93,25 @@ public class PomodoroPresenter implements Initializable {
 		btStart.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
 		btShortBreak.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
 		btLongBreak.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
+
+        isRemindProperty.bind(btRemind.selectedProperty());
+
+        isSoundEnabledProperty.bind(btSound.selectedProperty());
+
+        startUserReminderTask();
 	}
+
+    private void startUserReminderTask() {
+        new Timer().schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                if (Boolean.FALSE.equals(isRunningProperty.getValue()) && Boolean.TRUE.equals(isRemindProperty.getValue())) {
+                    Platform.runLater(PomodoroPresenter.this::getUserAttention);
+                }
+            }
+        }, REMINDER_TIMER_INTERVAL, REMINDER_TIMER_INTERVAL);
+    }
 
     public void drawArrowsWithProgressIndication(double progress) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -138,7 +168,6 @@ public class PomodoroPresenter implements Initializable {
 	@FXML
 	private void startAction() {
 		startCountdown(POMODORO_UNIT_MILLIS);
-
 	}
 
 	@FXML
@@ -191,11 +220,23 @@ public class PomodoroPresenter implements Initializable {
         btShortBreak.setSelected(false);
         btLongBreak.setSelected(false);
 
+        getUserAttention();
+    }
+
+    private void getUserAttention() {
         Stage stage = (Stage) btStart.getScene().getWindow();
         if (!stage.isFocused()) {
             stage.hide();
         }
         stage.show();
+
+        if (Boolean.TRUE.equals(isSoundEnabledProperty.getValue())) {
+            Platform.runLater(() -> {
+                Media song = new Media(getClass().getResource("ding_dong_dang.m4a").toExternalForm());
+                player = new MediaPlayer(song);
+                player.play();
+            });
+        }
     }
 
 	private void addHistoryEntry() {
