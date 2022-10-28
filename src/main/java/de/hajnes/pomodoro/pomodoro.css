@@ -1,3 +1,24 @@
 .tomato-button:disabled {
     -fx-opacity: 0.8;
 }
+
+.combo-box-icon {
+    -fx-background-image: url("pause.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 32;
+    -fx-background-position: center;
+    -fx-background-insets: 1.0, 1.0, 1.0, 1.0;
+}
+
+.combo-box-icon2 {
+    -fx-background-radius: null;
+    -fx-background-color: null;
+    -fx-background-image: url("pause.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 32;
+    -fx-background-position: center;
+    -fx-background-insets: 0, 0, 0, 0; /*1.0, 1.0, 1.0, 1.0;*/
+    /*-fx-border-radius: 0px;
+    /*-fx-border-color: black;
+    -fx-border-width: 2px;*/
+}

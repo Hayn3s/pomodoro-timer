@@ -2,11 +2,14 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -19,8 +22,8 @@
          <children>
             <StackPane>
                <children>
-                  <Canvas fx:id="canvas" height="200.0" width="200.0" />
-                  <BorderPane maxHeight="200.0" maxWidth="200.0" prefHeight="200.0" prefWidth="200.0">
+                  <Canvas fx:id="canvas" height="200.0" width="220.0" />
+                  <BorderPane maxHeight="200.0" maxWidth="220.0" prefHeight="200.0" prefWidth="220.0">
                      <center>
                         <Label fx:id="lbTimer" text="25:00">
                            <font>
@@ -29,15 +32,17 @@
                         </Label>
                      </center>
                      <left>
-                        <ToggleButton fx:id="btStart" mnemonicParsing="false" onAction="#startAction" styleClass="tomato-button" text="P" BorderPane.alignment="CENTER" />
+                        <ToggleButton fx:id="btStart" mnemonicParsing="false" onAction="#startAction" styleClass="tomato-button" BorderPane.alignment="CENTER">
+                           <graphic>
+                              <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@start.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic></ToggleButton>
                      </left>
                      <right>
-                        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
-                           <children>
-                              <ToggleButton fx:id="btShortBreak" mnemonicParsing="false" onAction="#shortBreakAction" styleClass="tomato-button" text="SB" />
-                              <ToggleButton fx:id="btLongBreak" mnemonicParsing="false" onAction="#longBreakAction" styleClass="tomato-button" text="LB" />
-                           </children>
-                        </HBox>
+                        <ComboBox fx:id="cbPause" maxWidth="40.0" prefHeight="40.0" prefWidth="40.0" styleClass="combo-box-icon" BorderPane.alignment="CENTER" />
                      </right>
                   </BorderPane>
                </children>
@@ -78,8 +83,22 @@
          <top>
             <HBox alignment="TOP_RIGHT" spacing="5.0">
                <children>
-                  <ToggleButton fx:id="btSound" mnemonicParsing="false" selected="true" text="S" />
-                  <ToggleButton fx:id="btRemind" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" selected="true" text="R" />
+                  <ToggleButton fx:id="btSound" focusTraversable="false" mnemonicParsing="false" selected="true">
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@sound.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></ToggleButton>
+                  <ToggleButton fx:id="btRemind" focusTraversable="false" mnemonicParsing="false" selected="true">
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@reminder.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></ToggleButton>
                </children>
                <BorderPane.margin>
                   <Insets bottom="5.0" top="5.0" />

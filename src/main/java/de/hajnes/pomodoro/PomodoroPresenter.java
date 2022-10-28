@@ -20,6 +20,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -34,7 +35,7 @@ import javafx.stage.Stage;
 public class PomodoroPresenter implements Initializable {
 
     private static final long POMODORO_UNIT_MILLIS = 1000L * 60L * 25L;
-    private static final long SHORT_BREAK_MILLIS = 1000L * 5L;
+    private static final long SHORT_BREAK_MILLIS = 1000L * 60L * 5L;
 	private static final long LONG_BREAK_MILLIS = 1000L * 60L * 15L;
 
 	private static final long TIMER_INTERVAL = 100L;
@@ -48,11 +49,8 @@ public class PomodoroPresenter implements Initializable {
 	@FXML
 	private ToggleButton btStart;
 
-	@FXML
-	private ToggleButton btShortBreak;
-
-	@FXML
-	private ToggleButton btLongBreak;
+    @FXML
+    private ComboBox<String> cbPause;
 
     @FXML
     private ToggleButton btRemind;
@@ -91,8 +89,18 @@ public class PomodoroPresenter implements Initializable {
 		tfTask.textProperty().bindBidirectional(taskPropery);
 
 		btStart.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
-		btShortBreak.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
-		btLongBreak.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
+
+        cbPause.getItems().addAll("5 min", "15 min");
+        cbPause.getSelectionModel().selectedItemProperty().addListener((o, oldValue, newValue) -> {
+            if (newValue == null) {
+                return;
+            } else if ("5 min".equalsIgnoreCase(newValue)) {
+                startCountdown(SHORT_BREAK_MILLIS);
+            } else {
+                startCountdown(LONG_BREAK_MILLIS);
+            }
+        });
+        cbPause.disableProperty().bind(isRunningProperty.or(taskPropery.isEmpty()));
 
         isRemindProperty.bind(btRemind.selectedProperty());
 
@@ -119,15 +127,15 @@ public class PomodoroPresenter implements Initializable {
 
         gc.setLineWidth(3.0);
 
-        Bounds btStartBounds = canvas.sceneToLocal(btStart.localToScene(btShortBreak.getBoundsInLocal()));
-        Bounds btShortBreakBounds = canvas.sceneToLocal(btShortBreak.localToScene(btShortBreak.getBoundsInLocal()));
+        Bounds btStartBounds = canvas.sceneToLocal(btStart.localToScene(cbPause.getBoundsInLocal()));
+        Bounds cbPauseBounds = canvas.sceneToLocal(cbPause.localToScene(cbPause.getBoundsInLocal()));
 
-		double arcWidth = btShortBreakBounds.getMaxX() - btStartBounds.getCenterX();
+        double arcWidth = cbPauseBounds.getCenterX() - btStartBounds.getCenterX();
 
         gc.setStroke(progress >= 1 && btStart.isSelected() ? Color.GREEN : Color.BLACK);
 
 		drawHalfCircle(gc, btStartBounds.getCenterX(), btStartBounds.getMinY() - ARC_OFFSET_Y, arcWidth, 0d);
-		drawArrowHead(gc, btShortBreakBounds.getMaxX(), btStartBounds.getMinY() - ARROWHEAD_OFFSET_Y, -10d);
+        drawArrowHead(gc, cbPauseBounds.getCenterX(), btStartBounds.getMinY() - ARROWHEAD_OFFSET_Y, -10d);
 
         gc.setStroke(progress >= 1 && !btStart.isSelected() ? Color.GREEN : Color.BLACK);
 
@@ -170,16 +178,6 @@ public class PomodoroPresenter implements Initializable {
 		startCountdown(POMODORO_UNIT_MILLIS);
 	}
 
-	@FXML
-	private void shortBreakAction() {
-		startCountdown(SHORT_BREAK_MILLIS);
-	}
-
-	@FXML
-	private void longBreakAction() {
-		startCountdown(LONG_BREAK_MILLIS);
-	}
-
 	private void startCountdown(long timeInMillis) {
 		isRunningProperty.set(true);
 		timerProperty.set(timeInMillis);
@@ -217,8 +215,7 @@ public class PomodoroPresenter implements Initializable {
             addHistoryEntry();
         }
         btStart.setSelected(false);
-        btShortBreak.setSelected(false);
-        btLongBreak.setSelected(false);
+        cbPause.getSelectionModel().clearSelection();
 
         getUserAttention();
     }
@@ -241,7 +238,7 @@ public class PomodoroPresenter implements Initializable {
 
 	private void addHistoryEntry() {
 		Hyperlink hyperlink = new Hyperlink(
-				MessageFormat.format("{0}h - {1}", dfHistory.format(new Date(timerTarget)), tfTask.getText()));
+            MessageFormat.format("{0}h - {1}", dfHistory.format(new Date(timerTarget)), tfTask.getText()));
 		hyperlink.setOnAction(e -> taskPropery.set(hyperlink.getText().substring("00:00h - ".length())));
 		pnHistory.getChildren().add(hyperlink);
         pnHistory.requestLayout();
